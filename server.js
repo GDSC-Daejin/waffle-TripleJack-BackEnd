@@ -134,6 +134,6 @@ app.post('/register', async (req, res) => {
       res.redirect('/');
     } catch (e) {
       console.log(e);
-      res.status(500).send('서버 에러남 (회원가입 에러)');
+      res.status(500).send('서버 에러남 (회원가입 에러).');
     }
 });
