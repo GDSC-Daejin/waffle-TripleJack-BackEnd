@@ -7,11 +7,26 @@ const LocalStrategy = require('passport-local');
 const bcrypt = require('bcrypt');
 const MongoStore = require('connect-mongo');
 
+
 const app = express(); // express 앱 생성
 const PORT = 4000; // 서버 포트 번호
 
 let db; // 데이터베이스 변수 선언
 
+
+const {User} = require('./models/User'); // 모델 스키마 가져오기
+
+app.post("/src/register", (req,res)=>{
+    const user = new User(req.body);
+
+    user.save((err, userInfo) => {
+        // 몽고디비에서 오는 메소드
+        if(err) return res.json({success : false, err});
+        return res.status(200).json({
+            success : true,
+        })
+    })
+})
 // MongoDB 연결 설정
 const url = 'mongodb://eozkvnf:mnbvcxz098!@152.70.232.21:27017/carpool?directConnection=true&serverSelectionTimeoutMS=2000&authSource=user&appName=mongosh+2.1.4';
 new MongoClient(url).connect().then((client)=>{
@@ -79,6 +94,9 @@ app.use((req, res, next) => {
 
 // 라우팅 설정
 
+
+
+
 //get은 서버 데이터를 달라고 할때 사용
 //Post는 데이터를 보내고 싶을때
 //Update는 보낸 데이터 수정할때
@@ -90,12 +108,8 @@ app.get('/???', (req,res)=>{
 */
 
 app.get('/', (req,res)=>{
-    res.sendFile(path.join(__dirname,'/build/index.html'))
+    res.sendFile(path.join(__dirname,'./build/index.html'))
 })
-
-
-
-
 
 
 
