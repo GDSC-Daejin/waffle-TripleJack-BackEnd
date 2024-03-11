@@ -56,4 +56,28 @@ UserSchema.pre("save", function(next) {
     }
 })
 
+// 비밀번호를 비교하는 메소드
+UserSchema.methods.comparePassword = function(plainPassword, cb) {
+    const user = this;
+    // plainPassword를 암호화해서 db에 있는 비밀번호와 비교
+    bcrypt.compare(plainPassword, user.password, function(err,isMatch) {
+        if(err) return cb(err);
+        cb(null, isMatch);
+    })
+}
+
+// 토큰 생성 메소드
+const jwt = require('jsonwebtoken'); // 토큰 생성하기
+
+UserSchema.methods.generateToken = function(cb) {
+    const user = this;
+    //jsonwebtoken을 이용해서 token을 생성하기
+    const token = jwt.sign(studentID.toHexString(), "secretToken");
+    user.token = token;
+    user.save(function(err,user){
+        if(err) return cb(err);
+        cb(null,user);
+    })
+}
+
 module.exports = {User}; // 다른 곳에서도 사용 가능하게 export

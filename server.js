@@ -13,20 +13,8 @@ const PORT = 4000; // 서버 포트 번호
 
 let db; // 데이터베이스 변수 선언
 
-
 const {User} = require('./models/User'); // 모델 스키마 가져오기
 
-app.post("/src/register", (req,res)=>{
-    const user = new User(req.body);
-
-    user.save((err, userInfo) => {
-        // 몽고디비에서 오는 메소드
-        if(err) return res.json({success : false, err});
-        return res.status(200).json({
-            success : true,
-        })
-    })
-})
 // MongoDB 연결 설정
 const url = 'mongodb://eozkvnf:mnbvcxz098!@152.70.232.21:27017/carpool?directConnection=true&serverSelectionTimeoutMS=2000&authSource=user&appName=mongosh+2.1.4';
 new MongoClient(url).connect().then((client)=>{
@@ -93,8 +81,52 @@ app.use((req, res, next) => {
 
 
 // 라우팅 설정
+app.post("/src/register", (req,res)=>{
+    const user = new User(req.body);
 
+    user.save((err, userInfo) => {
+        // 몽고디비에서 오는 메소드
+        if(err) return res.json({success : false, err});
+        return res.status(200).json({
+            success : true,
+        })
+    })
+})
 
+app.post("/src/login", (req,res)=>{
+    //요청된 학번을 데이터베이스에 있는지 찾는다.
+    User.findOne(
+        {
+            studentID : req.body.studentID,
+        },
+        (err,user) => {
+            if(!user) {
+                return res.json({
+                    loginSuccess : false,
+                    message : "학번에 해당하는 유저가 없습니다.",
+                });
+            }
+            // 요청된 이메일이 데이터베이스에 있다면 비밀번호가 맞는지 확인
+            user.comparePassword(req.body.password, (err,isMatch)=>{
+                if(!isMatch) {
+                    return res.json({
+                        loginSuccess : false,
+                        message : "비밀번호가 틀렸습니다.",
+                    });
+                }
+                // 비밀번호까지 맞다면 토큰 생성
+                user.generateToken((err,user)=>{
+                    if(err) return res.status(400).send(err);
+                    // 쿠키, 로컬스트리지, 세션 등에 토근 저장함.
+                    res
+                        .cookie("x_auth", user.token)
+                        .status(200)
+                        .json({loginSuccess : trun , studentID : studentID});
+                })
+            })
+        }
+    )
+})
 
 
 //get은 서버 데이터를 달라고 할때 사용
