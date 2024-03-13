@@ -9,6 +9,8 @@ const mongoose = require('mongoose'); // MongoDB ODM
 
 const { User } = require('./models/User'); // Mongoose 모델
 
+const connect = require('./models'); // DB연결 및 스키마 가져오기
+
 const authRoutes = require('./routes/auth');
 const postRoutes = require('./routes/posts');
 
@@ -21,6 +23,7 @@ const io = SocketIO(server, {path : '/socket.io'})
 // Express 애플리케이션 초기화
 const app = express();
 const PORT = 4000; // 서버 포트 번호
+connect(); // DB connect
 
 // MongoDB URL
 const mongoDbUrl = 'mongodb://eozkvnf:mnbvcxz098!@152.70.232.21:27017/carpool?authSource=user';
