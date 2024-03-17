@@ -14,12 +14,6 @@ const connect = require('./models'); // DB연결 및 스키마 가져오기
 const authRoutes = require('./routes/auth');
 const postRoutes = require('./routes/posts');
 
-// socket.io에 서버 정보 넘겨주고 구동
-const SocketIO = require('socket.io');
-
-//서버 연결, path는 프론트와 일치시켜야함
-const io = SocketIO(server, {path : '/socket.io'})
-
 // Express 애플리케이션 초기화
 const app = express();
 const PORT = 4000; // 서버 포트 번호
