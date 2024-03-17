@@ -1,11 +1,11 @@
-const express = require("express"); // Express 프레임워크
-const methodOverride = require('method-override'); // HTTP 메소드 오버라이드 지원
-const session = require('express-session'); // 세션 관리
-const passport = require('passport'); // 사용자 인증
-const LocalStrategy = require('passport-local').Strategy; // Passport 로컬 전략
-const bcrypt = require('bcrypt'); // 비밀번호 해싱
-const MongoStore = require('connect-mongo'); // 세션 데이터를 MongoDB에 저장
-const mongoose = require('mongoose'); // MongoDB ODM
+const express = require("express");
+const methodOverride = require('method-override');
+const session = require('express-session');
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+const bcrypt = require('bcrypt');
+const MongoStore = require('connect-mongo');
+const mongoose = require('mongoose');
 
 
 const { User } = require('./models/User'); // Mongoose 모델
@@ -17,24 +17,11 @@ const postRoutes = require('./routes/posts');
 
 // Express 애플리케이션 초기화
 const app = express();
-const PORT = 4000; // 서버 포트 번호
-connect(); // DB connect
+const PORT = 4000;
 
-
-// MongoDB 연결 및 서버 시작
-mongoose.connect(mongoDbUrl, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => {
-  console.log('Mongoose를 통한 MongoDB 연결 성공');
-  app.listen(PORT, () => {
-    console.log(`Http://localhost:${PORT} 에서 서버 실행중`);
-  });
-})
-.catch((err) => {
-  console.log('Mongoose 연결 실패:', err);
-});
+// DB 연결
+const userDb = connectUserDb();
+const postDb = connectPostDb();
 
 // 미들웨어 설정
 app.use(express.static(__dirname + '/public')); // 정적 파일 제공
@@ -46,7 +33,6 @@ app.use(session({ // 세션 설정
     resave: false, // 세션 재저장 여부
     saveUninitialized: false, // 초기화되지 않은 세션 저장 여부
     cookie: { maxAge: 60 * 60 * 1000 }, // 쿠키 유효 시간 (1시간)
-    store: MongoStore.create({ mongoUrl: mongoDbUrl, dbName: 'user' }) // 세션 저장소 설정
 }));
 app.use(passport.initialize()); // Passport 초기화
 app.use(passport.session()); // Passport 세션 사용
@@ -84,48 +70,63 @@ passport.deserializeUser(async (user, done) => {
     }
 });
 
+
+
+
+
+
 // 로그인 상태 공유 미들웨어
 app.use((req, res, next) => {
-    res.locals.user = req.user; // 현재 로그인한 사용자 정보 전달
+    res.locals.user = req.user;
     next();
 });
 
-/*
-// 사용자 등록 라우트
-app.post("/src/register", (req, res) => {
-    const user = new User(req.body); // 요청 데이터로 새 사용자 생성
-    user.save((err, userInfo) => {
-        if (err) return res.json({ success: false, err });
-        return res.status(200).json({ success: true });
-    });
-});
-
-// 로그인 처리 라우트
-app.post("/src/login", (req, res) => {
-    User.findOne({ studentID: req.body.studentID }, (err, user) => {
-        if (!user) {
-            return res.json({ loginSuccess: false, message: "학번에 해당하는 유저가 없습니다." });
-        }
-        user.comparePassword(req.body.password, (err, isMatch) => {
-            if (!isMatch) {
-                return res.json({ loginSuccess: false, message: "비밀번호가 틀렸습니다." });
-            }
-            user.generateToken((err, user) => {
-                if (err) return res.status(400).send(err);
-                res.cookie("x_auth", user.token).status(200).json({ loginSuccess: true, studentID: studentID });
-            });
-        });
-    });
-});
-*/
+// ... 나머지 라우트 및 설정 ...
 
 // 홈페이지 라우트
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, './build/index.html')); // 홈페이지 파일 제공
+    //res.sendFile(path.join(__dirname, './build/index.html')); // 홈페이지 파일 제공
+    res.send("Hello");
 });
 
-app.use('/auth', authRoutes); // 로그인 관련
 
-app.use('/posts', postsRoutes); // 게시물 관련
+// Test 라우트 설정
+app.get('/test', async (req, res) => {
+    try {
+        // User 모델과 Post 모델 로드
+        const User = userDb.model('User');
+        const Post = postDb.model('Post');
 
+        // 임시 사용자 생성 및 저장
+        const dummyUser = new User({
+            userName: "홍길동",
+            studID: "12345678",
+            password: "password",
+            callNumber: "010-1234-5678",
+            emailCertified: true
+        });
+        await dummyUser.save();
 
+        // 임시 게시글 생성 및 저장
+        const dummyPost = new Post({
+            writeDate: new Date(),
+            writer: dummyUser._id,
+            content: "임시 게시글 내용",
+            address: "경기도-포천시-포천시청",
+            carNumber: "12가3456",
+            whenToGo: "2024-03-21",
+            tag: "포천"
+        });
+        await dummyPost.save();
+
+        res.send("Test data created successfully");
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error creating test data");
+    }
+});
+
+// 서버 실행
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
