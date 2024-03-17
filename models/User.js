@@ -2,6 +2,10 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
+const jwt = require("jsonwebtoken"); // 토큰 생성하기 위함
+
+
+
 module.exports = (connection) => {
   // User 스키마 정의
   const userSchema = new mongoose.Schema({
@@ -33,7 +37,13 @@ module.exports = (connection) => {
     emailCertified: {
       type: Boolean,
       default: true
-    }
+    },
+    token : {
+      type : String,
+    },
+    tokenExp : {
+      type : Number,
+    },
   });
 
   // 사용자 저장 전 비밀번호 자동 해싱 미들웨어
@@ -64,6 +74,32 @@ module.exports = (connection) => {
       callback(null, isMatch);
     });
   };
+
+// 토큰 생성 메소드
+userSchema.methods.generateToken = function(cb) {
+  const user = this;
+  // jsonewebtoken 이용 token 생성
+  const token = jwt.sign(user._id.toHexString(), "secretToken");
+  user.token = token;
+  user.save(function(err,user){
+    if(err) return cb(err);
+    cb(null, user);
+  })
+}
+
+//토큰 복호화 메소드
+userSchemajj.statics.findByToken = function(token, cb) {
+  const user = this;
+  // 토큰 decode
+  jwt.verify(token, "secretToken", function(err,decoded) {
+    // 유저 아이디를 이용해서 유저 찾고
+    // 클라이언트에서 가져온 token과 db에 보관된 토큰이 일치하는지 확인
+    user.findOne({_id: decoded, token : token}, function(err,user){
+      if (err) return cb(err);
+      cb(null,user);
+    })
+  })
+}
 
   // User 모델 정의 및 해당 DB 연결에 모델 연결
   const User = connection.model('User', userSchema);
