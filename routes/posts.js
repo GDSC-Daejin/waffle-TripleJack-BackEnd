@@ -4,8 +4,10 @@ const Post = require('../models/Post'); // 게시물 모델
 
 const router = express.Router();
 
+
+
 // 게시물 목록 조회 라우트
-router.get('/', async (req, res, next) => {
+router.get('/ViewPost', async (req, res, next) => {
     try {
         // 모든 게시물을 조회하여 반환
         const posts = await Post.find({}).populate('writer');

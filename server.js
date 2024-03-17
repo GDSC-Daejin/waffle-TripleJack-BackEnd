@@ -7,6 +7,7 @@ const bcrypt = require('bcrypt'); // 비밀번호 해싱
 const MongoStore = require('connect-mongo'); // 세션 데이터를 MongoDB에 저장
 const mongoose = require('mongoose'); // MongoDB ODM
 
+
 const { User } = require('./models/User'); // Mongoose 모델
 
 const connect = require('./models'); // DB연결 및 스키마 가져오기
@@ -19,8 +20,6 @@ const app = express();
 const PORT = 4000; // 서버 포트 번호
 connect(); // DB connect
 
-// MongoDB URL
-const mongoDbUrl = 'mongodb://eozkvnf:mnbvcxz098!@152.70.232.21:27017/carpool?authSource=user';
 
 // MongoDB 연결 및 서버 시작
 mongoose.connect(mongoDbUrl, {
@@ -91,6 +90,7 @@ app.use((req, res, next) => {
     next();
 });
 
+/*
 // 사용자 등록 라우트
 app.post("/src/register", (req, res) => {
     const user = new User(req.body); // 요청 데이터로 새 사용자 생성
@@ -117,13 +117,15 @@ app.post("/src/login", (req, res) => {
         });
     });
 });
+*/
 
 // 홈페이지 라우트
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, './build/index.html')); // 홈페이지 파일 제공
 });
 
-app.use('/auth', authRoutes);
-app.use('/posts', postsRoutes);
+app.use('/auth', authRoutes); // 로그인 관련
+
+app.use('/posts', postsRoutes); // 게시물 관련
 
 
