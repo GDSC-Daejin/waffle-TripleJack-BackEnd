@@ -38,12 +38,6 @@ module.exports = (connection) => {
       type: Boolean,
       default: true
     },
-    token : {
-      type : String,
-    },
-    tokenExp : {
-      type : Number,
-    },
   });
 
   // 사용자 저장 전 비밀번호 자동 해싱 미들웨어
@@ -88,7 +82,7 @@ userSchema.methods.generateToken = function(cb) {
 }
 
 //토큰 복호화 메소드
-userSchemajj.statics.findByToken = function(token, cb) {
+userSchema.statics.findByToken = function(token, cb) {
   const user = this;
   // 토큰 decode
   jwt.verify(token, "secretToken", function(err,decoded) {

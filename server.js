@@ -1,18 +1,17 @@
 const express = require("express");
 const methodOverride = require('method-override');
 // const session = require('express-session');
-const LocalStrategy = require('passport-local').Strategy;
-const bcrypt = require('bcrypt');
-const login = require('./login');
-const database = require('./models/database')
+const user_login = require('./user_login');
+const database = require('./models/database');
 
 // Express 애플리케이션 초기화
 const app = express();
 const PORT = 4000;
 
 // DB 연결
-const userDb = connectUserDb();
-const postDb = connectPostDb();
+const userDb = database.connectUserDb();
+const postDb = database.connectPostDb();
+
 
 // 미들웨어 설정
 app.use(express.static(__dirname + '/public')); // 정적 파일 제공
