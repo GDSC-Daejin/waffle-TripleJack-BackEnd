@@ -12,8 +12,8 @@ app.use(bodyParser.urlencoded({extended : true}));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-const {User} = require("./models/User"); // 모델 스키마 가져오기
-const {auth} = require("./routes/auth"); // 인증 처리 가져오기
+const {User} = require("../models/User"); // 모델 스키마 가져오기
+const {auth} = require("../routes/auth"); // 인증 처리 가져오기
 
 const register = () => {
   app.post("/users/register", (req,res)=> {
