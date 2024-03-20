@@ -2,6 +2,7 @@ const express = require("express");
 const methodOverride = require('method-override');
 // const session = require('express-session');
 const user_login = require('./controller/user_login');
+const register = require('./controller/register');
 const database = require('./models/database');
 
 // Express 애플리케이션 초기화
@@ -43,8 +44,11 @@ app.get('/', (req, res) => {
     res.send("Hello");
 });
 
+//회원가입 라우트
+app.post('/register',register.register);
+
 //로그인 라우트
-app.post('/login', user_login.login); // 로그인 시 login 경로 사용
+app.post('/login', user_login.login);  // 로그인 시 login 경로 사용
 
 //access 토큰 재발급 라우트
 app.get('/refresh', user_login.refresh); // 토큰 재발급 시 refresh 경로 사용
