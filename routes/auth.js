@@ -2,7 +2,7 @@ const {User} = require('../models/User');
 
 // 인증 처리하는 곳
 let auth = (req,res,next) => {
-   // 클라이언트 쿠케에서 토큰 가져옴.
+   // 클라이언트 쿠키에서 토큰 가져옴.
    let token = req.cookies.x_auth;
    // 토큰 복호화 한 후 유저 찾기
    User.findByToken(token, (err,user)=>{

@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken'); //jwt import
 const JWT_KEY = process.env.ACCESS_TOKEN_SECRET // SECRET_KEY import
 
 //accessToken 발급 함수
-exports.makeToken = (Object) => {
+exports.makeAccessToken = (Object) => {
     const token = jwt.sign(
         Object,
         JWT_KEY,
@@ -38,7 +38,7 @@ exports.refreshVerify = async(token, studID) => {
         const collection = db.collection('User'); // 컬렉션 선택
 
         //DB에서 refreshToken 조회
-        const result = await collection.findOne({});
+        const result = await collection.findOne('User');
         // 조회한 refreshToken과 받은 token이 일치하는지 확인
         if(token===result.token) {
             try{
@@ -56,5 +56,21 @@ exports.refreshVerify = async(token, studID) => {
         return false;
     } finally {
         await getConnection.connectUserDb.close(); // DB 연결 닫기
+    }
+};
+
+//access token 유효성 검사
+exports.verify = (token) => {
+    try {
+        const decoded = jwt.verify(token,JWT_KEY);
+        return {
+            ok : true,
+            id : decoded.id
+        };
+    } catch (errer) {
+        return {
+            ok : false,
+            message : error.message,
+        };
     }
 };
