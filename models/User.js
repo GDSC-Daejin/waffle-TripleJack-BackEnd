@@ -29,15 +29,17 @@ module.exports = (connection) => {
       required: true
     },
     // 연락처, 필수 입력
-    callNumber: {
+    callNum: {
       type: String,
       required: true
     },
+    allReady : String,
+    allOk : String
     // 이메일 인증 여부, 기본값은 true (아직 인증 로직 안만듦)
-    emailCertified: {
-      type: Boolean,
-      default: true
-    },
+    // emailCertified: {
+    //   type: Boolean,
+    //   default: true
+    // }
   });
 
   // 사용자 저장 전 비밀번호 자동 해싱 미들웨어
