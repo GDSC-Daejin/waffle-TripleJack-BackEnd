@@ -1,75 +1,107 @@
-/* 유저 모델 스키마 가져오기
-body parser 이용하여 json 형식으로 요청 body를 가져오고 유저 인스턴스 생성
-로그인, 로그아웃 기능 구현 
-*/
-const express = require("express")
-const app = express();
+// 유저 로그인
 
-const bodyParser = require("body-parser");
-const cookieParser = require("cookie-parser");
+require('dotenv').config();
+const getConnection = require('../models/database');
+const TokenUtils = require('../utils/tokenUtils');
+const jwt = require('jsonwebtoken');
 
-app.use(bodyParser.urlencoded({extended : true}));
-app.use(bodyParser.json());
-app.use(cookieParser());
-
-const {User} = require("../models/User"); // 모델 스키마 가져오기
-const {auth} = require("../routes/auth"); // 인증 처리 가져오기
-
-const register = () => {
-  app.post("/users/register", (req,res)=> {
-  // 회원 가입 할 때 필요한 정보를 client에서 가져오고 데이터베이스에 넣기
-  const user = new User(req.body); // body parser 이용 json 형식으로 정보 가져옴
-
-  user.save((err,userInfo)=> {
-    // 디비에서 오는 메소드
-    if (err) return res.json({success : false, err});
-    return res.status(200).json({ // status 200 -> 성공 
-      success : true,
-    });
-  });
-});
+async function insertToken(userId, refreshToken, db) {
+  const tokenCollection = db.collection('tokens') // token 컬렉션 선택
+  const tokenDocument = {
+    userId : userId,
+    token : refreshToken
+  };
+  return await tokenCollection.insertOne(tokenDocument);
 }
 
-const login = () => {
-// 로그인 기능 구현
-app.post("/users/login",(req,res)=>{
-  // 요청된 학번을 DB에 있는지 찾기
-  User.findOne(
-    {
-      studID : req.body.studID,
-    },
-    (err,user) => {
-      if (!user) {
-        return res.json({
-          loginSuccess : false,
-          message : "해당 학번에 일치하는 사용자가 없습니다.",
-        });
-      }
-      // 요청된 학번이 DB에 있다면 password가 맞는지 확인
-      user.generateToken((err,user)=>{
-        if (err) return res.status(400).send(err);
-        // 토큰 저장
-        res
-          .cookie("x_auth", user.token)
-          .status(200)
-          .json({loginSuccess : true, userId : user._id});
-      })
-    }
-  )
-})
-}
+exports.login = async(req,res) => {
+  const {studID, password} = req.body;
 
-const logout = () => {
-//로그아웃 기능
-// user의 id에 해당하는 token 없애기
-app.get("/users/logout", auth, (req,res)=> {
-  User.findOneAndUpdate({_id : req.user._id}, {token : ""}, (err,user)=>{
-    if(err) return res.json({success : false, err});
-    return res.status(200).send({success : true});
+  //DB 연결
+  const db = await getConnection.connectUserDb.connect();
+
+  // studID로 사용자 찾기
+  const user = await findeUserByStudID(studID,db);
+
+  // user가 없는 경우
+  if(!user) {
+    return res.status(401).send('학번이 일치하지 않습니다')
+  }
+  //비밀번호가 일치하지 않는 경우
+  if(password !== user.password) {
+    return res.status(401).send('비밀번호가 일치하지 않습니다.')
+  }
+
+  //studID, password 같을 경우 토큰 발급
+  const accessToken = TokenUtils.makeAccessToken({id : studID});
+  const refreshToken = TokenUtils.makeRefreshToken();
+
+  //refreshToken, id DB에 저장
+  const result_insert = await insertToken(studID,refreshToken,db);
+
+  if(result_insert.state === false) return res.status(401).send("DB에 저장 실패")
+
+  return res.status(200).send({studID,accessToken,refreshToken})
+
+};
+
+const successResponse = (code,data) => {
+  return({
+    code : code,
+    data : data,
   })
-})
+}
+
+const failResponse = (code,message) => {
+  return({
+    code : code,
+    message : message,
+  })
+}
+
+exports.refresh = async(req,res) => {
+  // access, refresh token이 헤더에 담겨 온 경우
+  if(req.headers["authorization"] && req.headers["refresh"]) {
+    const accessToken = req.headers["authorization"].split(" ")[1];
+    const refreshToken = req.headers["refresh"];
+
+    // access token 검증 -> expired여야 함.
+    const authResult = TokenUtils.verify(accessToken);
+
+    // access token 디코딩 studID를 가져옴.
+    const decoded = jwt.decode(accessToken);
+
+    // 디코딩 결과가 없으면 권한 없음 응답
+    if(!decoded) {
+      res.status(401).send(failResponse(401,"권한이 없습니다."));
+    }
+    // access token 만료 시
+    if(authResult.ok === false && authResult.message === "jwt expired") {
+      // acceess token 만료, refresh token 만료 경우 -> 다시 로그인
+      const refreshResult = await TokenUtils.refreshVerify(refreshToken,decoded.id);
+      if(refreshResult === false) {
+        res.status(401).send(failResponse(401,"다시 로그인 해주세요."))
+      }
+      else {
+        // access token 만료 refresh token 만료 x -> 새로운 access token 발급
+        const newAccessToken = TokenUtils.makeAccessToken({id:decoded.id});
+
+        res.status(200).send(successResponse(
+          200,{
+            accessToken : newAccessToken,
+            refreshToken,
+          }
+        ));
+      }
+    } else {
+      // access token 만료 x-> refresh 할 필요 x
+      res.status(400).send(failResponse(400,"Access token 만료되지 않음"));
+    }
+  } else {
+    // access token 또는 refresh token이 헤더에 없는 경우
+    res.status(401).send(failResponse(400,"Refresh token 필요함. Access token,Refresh token 필요"));
+  }
 }
 
 
-module.exports = {register,login, logout};
 
