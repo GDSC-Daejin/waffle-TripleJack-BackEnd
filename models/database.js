@@ -1,8 +1,12 @@
 const mongoose = require('mongoose');
+require('dotenv').config();
+
+const uriUser = process.env.USER_DB_URI;
+const uriPost = process.env.POST_DB_URI;
+
 
 const connectUserDb = () => {
-  const uri = 'mongodb://eozkvnf:vmfhwprxm12~@152.70.232.21:27017/User?authSource=admin';
-  const userDb = mongoose.createConnection(uri, {useNewUrlParser : true, useUnifiedTopology : true});
+  const userDb = mongoose.createConnection(uriUser, {useNewUrlParser : true, useUnifiedTopology : true});
   require('./User')(userDb);
 
   userDb.on('error', console.error.bind(console, 'User DB connection error:'));
@@ -13,8 +17,7 @@ const connectUserDb = () => {
 };
 
 const connectPostDb = () => {
-  const uri = 'mongodb://eozkvnf:vmfhwprxm12~@152.70.232.21:27017/Post?authSource=admin';
-  const postDb = mongoose.createConnection(uri, {useNewUrlParser : true, useUnifiedTopology : true});
+  const postDb = mongoose.createConnection(uriPost, {useNewUrlParser : true, useUnifiedTopology : true});
   require('./Post')(postDb);
 
   postDb.on('error', console.error.bind(console, 'Post DB connection error:'));
