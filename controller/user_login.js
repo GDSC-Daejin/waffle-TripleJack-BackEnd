@@ -1,7 +1,7 @@
 // 유저 로그인
 
 require('dotenv').config();
-const getConnection = require('../models/database');
+const {connectUserDb} = require('../models/database');
 const TokenUtils = require('../utils/tokenUtils');
 const jwt = require('jsonwebtoken');
 
@@ -18,7 +18,7 @@ exports.login = async(req,res) => {
   const {studID, password} = req.body;
 
   //DB 연결
-  const db = await getConnection.connectUserDb.connect();
+  const db = await connectUserDb();
 
   // studID로 사용자 찾기
   const user = await findeUserByStudID(studID,db);

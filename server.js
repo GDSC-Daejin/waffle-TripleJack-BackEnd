@@ -44,8 +44,9 @@ app.get('/', (req, res) => {
     res.send("Hello");
 });
 
-//회원가입 라우트
-app.post('/register',register.register);
+app.get('/join',(req,res)=>{
+    res.send('회원가입 창으로 가주세용'); //send는 바꿀 예정
+})
 
 //로그인 라우트
 app.post('/login', user_login.login);  // 로그인 시 login 경로 사용

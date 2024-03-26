@@ -1,0 +1,1 @@
+// User가 Post 관련되서 신청했을 때 DB에 all_ready, all_check, this_ready, this_check 제어 코드
