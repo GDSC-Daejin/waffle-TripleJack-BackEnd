@@ -18,8 +18,16 @@ module.exports = (connection) => {
       type: String,
       required: true
     },
-    // 주소
-    address: String,
+    // 출발주소
+    startAddress: {
+      type : String,
+      required : true
+    },
+    // 도착주소
+    endAddress: {
+      type : String,
+      required : true
+    },
     // 차량 번호
     carNum: String,
     // 언제 갈 것인지
