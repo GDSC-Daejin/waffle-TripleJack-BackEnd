@@ -1,9 +1,16 @@
 const mongoose = require('mongoose');
+const formatDate = require('./dateUtils');
+
+const today = new Date();
 
 module.exports = (connection) => {
   // Post 스키마 정의
   const postSchema = new mongoose.Schema({
     // 작성자 ID, User 스키마를 참조
+    date: {
+      type: String,
+      default: () => formatDate(new Date()) // 기본값으로 오늘 날짜의 포맷된 문자열 사용
+    },
     writer: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User'

@@ -34,6 +34,14 @@ module.exports = (connection) => {
       type: Boolean,
       default: true
     },
+    // 만든 개시물 
+    posts: [{
+      postId: mongoose.Schema.Types.ObjectId, // 게시물의 Object ID
+      date: {
+        type: String,
+        default: () => formatDate(new Date()) // 기본값으로 오늘 날짜의 포맷된 문자열 사용
+      }
+    }]
   });
 
   // 사용자 저장 전 비밀번호 자동 해싱 미들웨어
