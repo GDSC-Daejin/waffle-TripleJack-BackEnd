@@ -1,5 +1,4 @@
 const express = require('express');
-const { isLoggedIn } = require('./middlewares'); // 로그인 여부를 확인하는 미들웨어
 const Post = require('../models/Post'); // 게시물 모델
 
 const router = express.Router();
