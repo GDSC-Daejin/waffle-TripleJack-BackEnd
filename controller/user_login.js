@@ -5,7 +5,7 @@ const { User, Token } = require('../models/UserDB'); // User와 Token 모델 가
 const tokenUtils = require('../utils/tokenUtils'); // 토큰 관련 유틸리티 함수
 
 
-
+//로그인 함수
 exports.login = async (req, res) => {
   const { studID, password } = req.body;
 
@@ -46,6 +46,20 @@ exports.login = async (req, res) => {
     return res.status(500).json({ message: "서버 에러" });
   }
 };
+
+// 로그아웃 함수
+exports.logout = async (req, res) => {
+  try {
+    // 클라이언트 측에서는 토큰을 제거하고, 서버 측에서는 저장된 리프레시 토큰을 삭제
+    // 여기에서는 클라이언트가 보낸 리프레시 토큰을 데이터베이스에서 찾아 삭제하는 로직을 구현
+    const { refreshToken } = req.body;
+    await Token.deleteOne({ token: refreshToken });
+    res.status(200).json({ message: "성공적으로 로그아웃되었습니다." });
+  } catch (error) {
+    res.status(500).json({ message: "서버 오류" });
+  }
+};
+
 
 const successResponse = (code,data) => {
   return({

@@ -21,7 +21,7 @@ module.exports = (connection) => {
     // 게시물 내용, 필수 항목
     content: {
       type: String,
-      required: true
+      default : " ",
     },
     // 출발주소
     startAddress: {
@@ -38,9 +38,15 @@ module.exports = (connection) => {
     // 언제 갈 것인지
     goTime: String,
     //신청한 유저
-    thisReady : String,
+    thisReady : {
+      type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], // 신청한 게시글의 ObjectId 배열
+      default: []
+    },
     //확정된 유저
-    thisOk: String,
+    thisOk: {
+      type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], // 신청한 게시글의 ObjectId 배열
+      default: []
+    },
     // 태그
     tag: String
   });
