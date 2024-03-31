@@ -68,7 +68,7 @@ exports.refresh = async(req,res) => {
     const refreshToken = req.headers["refresh"];
 
     // access token 검증 -> expired여야 함.
-    const authResult = TokenUtils.verify(accessToken);
+    const authResult = tokenUtils.verify(accessToken);
 
     // access token 디코딩 studID를 가져옴.
     const decoded = jwt.decode(accessToken);
@@ -80,13 +80,13 @@ exports.refresh = async(req,res) => {
     // access token 만료 시
     if(authResult.ok === false && authResult.message === "jwt expired") {
       // acceess token 만료, refresh token 만료 경우 -> 다시 로그인
-      const refreshResult = await TokenUtils.refreshVerify(refreshToken,decoded.id);
+      const refreshResult = await tokenUtils.refreshVerify(refreshToken,decoded.id);
       if(refreshResult === false) {
         res.status(401).send(failResponse(401,"다시 로그인 해주세요."))
       }
       else {
         // access token 만료 refresh token 만료 x -> 새로운 access token 발급
-        const newAccessToken = TokenUtils.makeAccessToken({id:decoded.id});
+        const newAccessToken = tokenUtils.makeAccessToken({id:decoded.id});
 
         res.status(200).send(successResponse(
           200,{
