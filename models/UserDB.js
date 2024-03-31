@@ -4,7 +4,7 @@ require('dotenv').config(); // 환경 변수를 로드하기 위해 dotenv 모�
 const uriUser = process.env.USER_DB_URI; // User 데이터베이스의 URI
 const userDb = mongoose.createConnection(uriUser, { useNewUrlParser: true, useUnifiedTopology: true }); // User DB에 연결
 
-const User = require('./models/User')(userDb); // User 모델을 정의하는데 사용되는 스키마
+const User = require('./User')(userDb); // User 모델을 정의하는데 사용되는 스키마
 
 // Token 스키마 정의
 const tokenSchema = new mongoose.Schema({
@@ -26,6 +26,6 @@ const tokenSchema = new mongoose.Schema({
 });
 
 // Token 모델 정의
-const Token = userDb.model('Token', tokenSchema); // 'tokens' 컬렉션에 대한 모델
+const Token = userDb.model('tokens', tokenSchema); // 'tokens' 컬렉션에 대한 모델
 
 module.exports = { userDb, User, Token }; // 모듈로 내보내기, 필요한 곳에서 이 모델들을 사용할 수 있음

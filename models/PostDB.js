@@ -5,8 +5,8 @@ require('dotenv').config();
 const uriPost = process.env.POST_DB_URI;
 const postDb = mongoose.createConnection(uriPost, { useNewUrlParser: true, useUnifiedTopology: true });
 
-const addDaysAndGetFormattedDate = require('./utils/dataUtils'); 
-const postSchema = require('./models/Post'); 
+const addDaysAndGetFormattedDate = require('./dataUtils'); 
+const postSchema = require('./Post'); 
 
 // 특정 날짜에 대한 Post 모델을 반환하는 함수
 const getPostModelByDate = (daysToAdd) => {

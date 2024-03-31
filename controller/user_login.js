@@ -1,7 +1,7 @@
 // 유저 로그인
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const { User, Token } = require('../db/UserDB'); // User와 Token 모델 가져오기
+const { User, Token } = require('../models/UserDB'); // User와 Token 모델 가져오기
 const tokenUtils = require('../utils/tokenUtils'); // 토큰 관련 유틸리티 함수
 
 

@@ -1,4 +1,4 @@
-const { User } = require('../db/UserDB'); // User 모델 가져오기
+const { User } = require('../models/UserDB'); // User 모델 가져오기
 
 // 회원가입 처리 함수
 exports.register = async (req, res) => {
