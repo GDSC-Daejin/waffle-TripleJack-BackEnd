@@ -1,48 +1,50 @@
 // 유저 로그인
-
-require('dotenv').config();
-const {connectUserDb} = require('../models/database');
-const TokenUtils = require('../utils/tokenUtils');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const { User, Token } = require('../db/UserDB'); // User와 Token 모델 가져오기
+const tokenUtils = require('../utils/tokenUtils'); // 토큰 관련 유틸리티 함수
 
-async function insertToken(userId, refreshToken, db) {
-  const tokenCollection = db.collection('tokens') // token 컬렉션 선택
-  const tokenDocument = {
-    userId : userId,
-    token : refreshToken
-  };
-  return await tokenCollection.insertOne(tokenDocument);
-}
 
-exports.login = async(req,res) => {
-  const {studID, password} = req.body;
 
-  //DB 연결
-  const db = await connectUserDb();
+exports.login = async (req, res) => {
+  const { studID, password } = req.body;
 
-  // studID로 사용자 찾기
-  const user = await findeUserByStudID(studID,db);
+  try {
+    // studID를 이용해 사용자 찾기
+    const user = await User.findOne({ studID: studID });
+    if (!user) {
+      // 사용자가 없는 경우 오류 응답
+      return res.status(401).json({ message: "등록되지 않은 유저입니다." });
+    }
 
-  // user가 없는 경우
-  if(!user) {
-    return res.status(401).send('학번이 일치하지 않습니다')
+    // 비밀번호 검증
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      // 비밀번호가 일치하지 않는 경우
+      return res.status(401).json({ message: "비밀번호가 일치하지 않습니다." });
+    }
+
+    // 사용자 인증 성공 시, JWT 토큰 생성
+    const accessToken = tokenUtils.makeAccessToken({ id: user._id });
+
+    // 리프레쉬 토큰 생성 및 저장
+    const refreshToken = tokenUtils.makeRefreshToken();
+    const expiresIn = new Date();
+    expiresIn.setDate(expiresIn.getDate() + 7); // 만료 기간을 7일로 설정
+    await new Token({
+      userId: user._id,
+      token: refreshToken,
+      expiresIn: expiresIn
+    }).save();
+
+    // 생성된 토큰 응답으로 반환
+    return res.status(200).json({ accessToken, refreshToken });
+
+  } catch (error) {
+    // 서버 오류 처리
+    console.error(error);
+    return res.status(500).json({ message: "서버 에러" });
   }
-  //비밀번호가 일치하지 않는 경우
-  if(password !== user.password) {
-    return res.status(401).send('비밀번호가 일치하지 않습니다.')
-  }
-
-  //studID, password 같을 경우 토큰 발급
-  const accessToken = TokenUtils.makeAccessToken({id : studID});
-  const refreshToken = TokenUtils.makeRefreshToken();
-
-  //refreshToken, id DB에 저장
-  const result_insert = await insertToken(studID,refreshToken,db);
-
-  if(result_insert.state === false) return res.status(401).send("DB에 저장 실패")
-
-  return res.status(200).send({studID,accessToken,refreshToken})
-
 };
 
 const successResponse = (code,data) => {

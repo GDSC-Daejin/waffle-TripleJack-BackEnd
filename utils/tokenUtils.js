@@ -5,9 +5,9 @@ const jwt = require('jsonwebtoken'); //jwt import
 const JWT_KEY = process.env.ACCESS_TOKEN_SECRET // SECRET_KEY import
 
 //accessToken 발급 함수
-exports.makeAccessToken = (Object) => {
+exports.makeAccessToken = (user) => {
     const token = jwt.sign(
-        Object,
+        { id: user._id },
         JWT_KEY,
         {expiresIn : "1h"} //accessToken 만료기간 1시간
     );
@@ -35,10 +35,10 @@ exports.refreshVerify = async(token, studID) => {
         await getConnection.connectUserDb.connect(); // mongodb 연결
         
         const db = getConnection.connectUserDb.db('User'); // 데이터베이스 선택
-        const collection = db.collection('User'); // 컬렉션 선택
+        const collection = db.collection('user'); // 컬렉션 선택 // User가 아니라 user
 
         //DB에서 refreshToken 조회
-        const result = await collection.findOne('User');
+        const result = await collection.findOne({userId: studID});
         // 조회한 refreshToken과 받은 token이 일치하는지 확인
         if(token===result.token) {
             try{

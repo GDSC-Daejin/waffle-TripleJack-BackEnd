@@ -1,20 +1,10 @@
-
-function formatDate(date) {
-    // 함수 내용
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1; // 월은 0부터 시작하므로 1을 더함
-    const day = date.getDate();
-
-    // 월과 일이 한 자리 수일 경우 앞에 0을 붙여줌
-    const formattedMonth = month < 10 ? `0${month}` : month;
-    const formattedDay = day < 10 ? `0${day}` : day;
-
-    // YY-MM-DD 형식으로 반환
-    return `${year}-${formattedMonth}-${formattedDay}`;
+function formatDate() {
+    const date = new Date(); // 현재 날짜 가져오기
+    const year = date.getFullYear().toString().slice(-2); // 연도의 마지막 두 자리
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // 월 (1을 더함)
+    const day = date.getDate().toString().padStart(2, '0'); // 일
+  
+    return `${year}-${month}-${day}`;
 }
-
-const today = new Date();
-const formattedDate = formatDate(today);
-console.log(formattedDate); // 예: "2024-03-29"
   
 module.exports = formatDate;

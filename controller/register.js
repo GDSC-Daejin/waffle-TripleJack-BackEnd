@@ -1,35 +1,33 @@
-const express = require('express');
-const router = express.Router();
-const User = require('../models/User');
+const { User } = require('../db/UserDB'); // User 모델 가져오기
 
-router.post('/register', async(req,res)=>{
+// 회원가입 처리 함수
+exports.register = async (req, res) => {
+  const { studID, password, userName, callNum } = req.body;
 
-    const checkUser = await User.findOne({studID : req.body.studID});
-
-    //이미 존재하는 학번이라면 success:false
-    if(checkUser) {
-        console.log('존재하는 학번임');
-        res.send({success : false})
-        return;        
+  try {
+    // 동일한 학번을 가진 사용자가 이미 있는지 확인
+    const existingUser = await User.findOne({ studID: studID });
+    if (existingUser) {
+      return res.status(400).json({ message: "이미 등록된 학번입니다." });
     }
-    
-    const user = new User();
-    const {name,studID,password} = req.body;
 
-    user.name = name;
-    user.studID = studID;
-    user.password = password;
+    // 새 사용자 객체 생성
+    const newUser = new User({
+      studID,
+      password, // 비밀번호는 User 모델의 pre save 미들웨어에서 해시됨
+      userName,
+      callNum,
+      // 나머지 필드는 스키마의 기본값으로 설정됨
+    });
 
-    user.save((err)=>{
-        if(err){
-            return res.status(400).send(err);
-        }
-        else{
-            return res.status(201).send({
-                success : true
-            })
-        }
-    })
-})
+    // 사용자 데이터베이스에 저장
+    await newUser.save();
 
-module.exports = router;
+    // 회원가입 성공 응답
+    res.status(201).json({ message: "회원가입 성공" });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "서버 에러" });
+  }
+};
