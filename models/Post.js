@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
 const formatDate = require('./dateUtils');
 
-const today = new Date();
-
 module.exports = (connection) => {
   // Post 스키마 정의
   const postSchema = new mongoose.Schema({

@@ -25,7 +25,7 @@ module.exports = (connection) => {
       required: true
     },
     // 연락처, 필수 입력
-    callNumber: {
+    callNum: {
       type: String,
       required: true
     },
@@ -37,10 +37,6 @@ module.exports = (connection) => {
     // 만든 개시물 
     posts: [{
       postId: mongoose.Schema.Types.ObjectId, // 게시물의 Object ID
-      date: {
-        type: String,
-        default: () => formatDate(new Date()) // 기본값으로 오늘 날짜의 포맷된 문자열 사용
-      }
     }]
   });
 

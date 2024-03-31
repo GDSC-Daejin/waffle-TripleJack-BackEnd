@@ -1,4 +1,4 @@
-// dateUtils.js
+
 function formatDate(date) {
     // 함수 내용
     const year = date.getFullYear();
@@ -12,8 +12,9 @@ function formatDate(date) {
     // YY-MM-DD 형식으로 반환
     return `${year}-${formattedMonth}-${formattedDay}`;
 }
-    const today = new Date();
-    const formattedDate = formatDate(today);
-    console.log(formattedDate); // 예: "2024-03-29"
+
+const today = new Date();
+const formattedDate = formatDate(today);
+console.log(formattedDate); // 예: "2024-03-29"
   
 module.exports = formatDate;
