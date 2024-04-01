@@ -9,6 +9,9 @@ const tokenUtils = require('../utils/tokenUtils'); // 토큰 관련 유틸리티
 exports.login = async (req, res) => {
   const { studID, password } = req.body;
 
+  console.log(`유저 로그인 : 값 \n ${req.body}`);
+
+
   try {
     // studID를 이용해 사용자 찾기
     const user = await User.findOne({ studID: studID });

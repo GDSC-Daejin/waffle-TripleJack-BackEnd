@@ -10,6 +10,7 @@ exports.register = async (req, res) => {
     if (existingUser) {
       return res.status(400).json({ message: "이미 등록된 학번입니다." });
     }
+    console.log(`유저 등록 : 값 \n ${req.body}`);
 
     // 새 사용자 객체 생성
     const newUser = new User({
