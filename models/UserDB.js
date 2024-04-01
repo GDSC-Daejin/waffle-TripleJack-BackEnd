@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 require('dotenv').config(); // 환경 변수를 로드하기 위해 dotenv 모듈 사용
 
 const uriUser = process.env.USER_DB_URI; // User 데이터베이스의 URI
-const userDb = mongoose.createConnection(uriUser, { useNewUrlParser: true, useUnifiedTopology: true }); // User DB에 연결
+const userDb = mongoose.createConnection(uriUser); // User DB에 연결
 
 const User = require('./User')(userDb); // User 모델을 정의하는데 사용되는 스키마
 

@@ -3,7 +3,7 @@ const cron = require('node-cron');
 require('dotenv').config();
 
 const uriPost = process.env.POST_DB_URI;
-const postDb = mongoose.createConnection(uriPost, { useNewUrlParser: true, useUnifiedTopology: true });
+const postDb = mongoose.createConnection(uriPost);
 
 const addDaysAndGetFormattedDate = require('./dataUtils'); 
 const postSchema = require('./Post'); 

@@ -77,5 +77,5 @@ module.exports = function(dbConnection) {
     };
 
     // dbConnection을 사용하여 User 모델 생성 및 반환
-    return dbConnection.model('User', userSchema);
+    return dbConnection.model('User', userSchema, 'user');
 };

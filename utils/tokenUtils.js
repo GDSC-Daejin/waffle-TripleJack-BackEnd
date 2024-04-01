@@ -32,7 +32,7 @@ exports.makeRefreshToken = () => {
 exports.refreshVerify = async (token, studID) => {
     try {
         // MongoDB 연결 및 컬렉션 선택
-        const collection = userDb.collection('users'); // 'users' 컬렉션 사용
+        const collection = userDb.collection('user'); // 'users' 컬렉션 사용
 
         // DB에서 refreshToken 조회
         const result = await collection.findOne({ userId: studID });
