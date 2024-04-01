@@ -1,5 +1,6 @@
 const express = require("express");
 const methodOverride = require('method-override');
+const cors = require("cors");
 
 // 컨트롤러 및 데이터베이스 모듈 가져오기
 const { userDb } = require('./models/UserDB');
@@ -21,6 +22,10 @@ postDb.on('error', console.error.bind(console, 'MongoDB 연결 에러:'));
 // 미들웨어 설정
 app.use(express.json()); // JSON 요청 본문 처리
 app.use(methodOverride()); // HTTP 메소드 오버라이드
+
+app.use(cors({
+    origin: '*' // 모든 출처 허용
+}));
 
 
 // 서버 실행
