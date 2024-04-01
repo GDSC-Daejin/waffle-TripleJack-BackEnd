@@ -17,11 +17,11 @@ const tokenSchema = new mongoose.Schema({
     type: String, // 실제 토큰 문자열
     required: true
   },
-// 만료 시간 필드 추가
-    expiresIn: {
-        type: Date,
-        required: true
-    }
+  // 만료 시간 필드 추가
+  expiresIn: {
+    type: Date,  
+    required: true
+  }
   // 필요에 따라 만료 시간(expiration) 등의 추가 필드를 정의할 수 있음
 });
 
