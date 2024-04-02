@@ -17,7 +17,7 @@ exports.makeAccessToken = (user) => {
 // refreshToken 발급 함수
 exports.makeRefreshToken = () => {
     const refreshToken = jwt.sign(
-        {},
+        {userId : studID},
         JWT_KEY,
         {
             algorithm: "HS256",
@@ -66,4 +66,4 @@ exports.verify = (token) => {
             message: error.message
         };
     }
-};
+}; 

@@ -24,7 +24,8 @@ app.use(express.json()); // JSON 요청 본문 처리
 app.use(methodOverride()); // HTTP 메소드 오버라이드
 
 app.use(cors({
-    origin: '*' // 모든 출처 허용
+    origin: '*', // 모든 출처 허용
+    credentials : true,
 }));
 
 

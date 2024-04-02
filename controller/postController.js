@@ -50,7 +50,9 @@ exports.insertPost = async (req, res) => {
     try {
         const { carNum, dep, des, recruit, schoolState, selectDate, goTime } = req.body;
         const userId = req.user.id; // JWT 인증을 통해 얻은 사용자 ID
-        const collectionName = `posts_${selectDate}`;
+        console.log(req.body
+            )
+        const collectionName = `${selectDate}`;
 
         // 동적으로 컬렉션 이름을 가진 모델 생성
         const PostModel = mongoose.model(collectionName, PostSchema, collectionName);
