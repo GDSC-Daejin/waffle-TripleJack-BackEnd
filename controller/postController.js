@@ -2,11 +2,13 @@ const { Post } = require('../models/PostDB');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const { PostSchema } = require('../models/Post'); // Post 스키마 가져오기
+const addDaysAndGetFormattedDate = require('../models/dataUtils');
+
 
 exports.getPostsByDay = async (req, res) => {
     try {
         const { date } = req.query; // "YY-MM-DD" 형식의 날짜
-
+	console.log("1");
         // 날짜에 해당하는 게시물 조회
         const posts = await Post.find({ date }).exec();
 
@@ -27,7 +29,7 @@ exports.userReady = async (req, res) => {
         const token = req.headers.authorization.split(' ')[1]; // "Bearer TOKEN" 형식 가정
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const userId = decoded.id; // 사용자 ID 추출
-
+	console.log("2");
         // 게시물 조회 및 업데이트
         const post = await Post.findById(postId);
         if (!post) {
@@ -47,16 +49,23 @@ exports.userReady = async (req, res) => {
 };
 
 exports.insertPost = async (req, res) => {
+
+    console.table(req.body);
     try {
+	    console.table(req.headers);
         const { carNum, dep, des, recruit, schoolState, selectDate, goTime } = req.body;
-        const userId = req.user.id; // JWT 인증을 통해 얻은 사용자 ID
-        console.log(req.body
-            )
-        const collectionName = `${selectDate}`;
-
+        const userId = req.user.id;
+        console.log(`3 : ${userId}`);
+        const collectionName = addDaysAndGetFormattedDate(0);
+        console.log(collectionName);
         // 동적으로 컬렉션 이름을 가진 모델 생성
-        const PostModel = mongoose.model(collectionName, PostSchema, collectionName);
-
+        let PostModel;
+        if (mongoose.models[collectionName]) {
+            PostModel = mongoose.model(collectionName);
+        } else {
+            PostModel = mongoose.model(collectionName, PostSchema, collectionName);
+        }
+        console.log("4")
         // 새 게시물 인스턴스 생성
         const newPost = new PostModel({
             carNum,
@@ -74,6 +83,7 @@ exports.insertPost = async (req, res) => {
 
         res.status(201).json({ message: "게시글이 성공적으로 생성되었습니다.", postId: newPost._id });
     } catch (error) {
-        res.status(500).json({ message: "서버 오류" });
+        console.error("게시글 저장 중 에러 발생:", error);
+        res.status(500).json({ message: "서버 오류", error: error.message });
     }
 };

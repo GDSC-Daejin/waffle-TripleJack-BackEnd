@@ -1,6 +1,7 @@
 const express = require("express");
 const methodOverride = require('method-override');
 const cors = require("cors");
+const cookieParser = require('cookie-parser');
 
 // 컨트롤러 및 데이터베이스 모듈 가져오기
 const { userDb } = require('./models/UserDB');
@@ -22,10 +23,11 @@ postDb.on('error', console.error.bind(console, 'MongoDB 연결 에러:'));
 // 미들웨어 설정
 app.use(express.json()); // JSON 요청 본문 처리
 app.use(methodOverride()); // HTTP 메소드 오버라이드
+app.use(cookieParser());
 
 app.use(cors({
-    origin: '*', // 모든 출처 허용
-    credentials : true,
+	origin: 'http://localhost:3000',
+	credentials : true,
 }));
 
 
@@ -33,10 +35,6 @@ app.use(cors({
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
-
-
-
-
 
 // 직접 /login /logout /register 라우트 작성
 app.post('/login', userLoginController.login);

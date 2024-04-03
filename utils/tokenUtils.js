@@ -6,25 +6,26 @@ const JWT_KEY = process.env.ACCESS_TOKEN_SECRET; // SECRET_KEY import
 // accessToken 발급 함수
 exports.makeAccessToken = (user) => {
     const token = jwt.sign(
-        { id: user._id },
+        { id: user.id.toString('hex') },
         JWT_KEY,
         { expiresIn: "1h" } // accessToken 만료기간 1시간
     );
-    console.log(token);
+    
+    console.log(`accessToken : ${token}`);
     return token;
 };
 
 // refreshToken 발급 함수
 exports.makeRefreshToken = () => {
     const refreshToken = jwt.sign(
-        {userId : studID},
+        {},
         JWT_KEY,
         {
             algorithm: "HS256",
             expiresIn: "7d" // refreshToken 만료기간 1주일
         }
     );
-    console.log(refreshToken);
+    console.log(`refreshToken : ${refreshToken}`);
     return refreshToken;
 };
 
@@ -66,4 +67,4 @@ exports.verify = (token) => {
             message: error.message
         };
     }
-}; 
+};

@@ -29,7 +29,7 @@ exports.login = async (req, res) => {
 
     // 사용자 인증 성공 시, JWT 토큰 생성
     const accessToken = tokenUtils.makeAccessToken({ id: user._id });
-
+    console.table(accessToken);
     // 리프레쉬 토큰 생성 및 저장
     const refreshToken = tokenUtils.makeRefreshToken();
     const expiresIn = new Date();
